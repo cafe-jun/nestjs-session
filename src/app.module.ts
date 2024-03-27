@@ -11,9 +11,7 @@ import { PrismaModule } from 'nestjs-prisma';
     PrismaModule.forRoot({
       isGlobal: true,
       prismaServiceOptions: {
-        prismaOptions: {
-          log: ,
-        },
+        prismaOptions: {},
       },
     }),
     RedisModule.forRoot({
