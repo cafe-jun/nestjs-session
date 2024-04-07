@@ -1,14 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { SessionRepository } from '../service/repository/session.repository';
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import { DEFAULT_REDIS_NAMESPACE, InjectRedis } from '@liaoliaots/nestjs-redis';
 import { Redis } from 'ioredis';
 import { v4 as uuidV4 } from 'uuid';
 
 const SESSION_KEY = 'SESSION:';
 
 @Injectable()
-export class SessionRepositoryImpl implements SessionRepository {
-  constructor(@InjectRedis() private redisClient: Redis) {}
+export class SessionRepositoryImpl implements SessionRepository, OnModuleInit {
+  constructor(
+    @InjectRedis(DEFAULT_REDIS_NAMESPACE) private redisClient: Redis,
+    @InjectRedis('subscribe') private subscribe: Redis,
+  ) {}
+  async onModuleInit() {}
   async create(sessionDate: any): Promise<string> {
     const sessionId = uuidV4();
     const strSessionData = JSON.stringify(sessionDate);

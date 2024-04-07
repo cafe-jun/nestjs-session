@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { RedisModule } from '@liaoliaots/nestjs-redis';
+import { DEFAULT_REDIS_NAMESPACE, RedisModule } from '@liaoliaots/nestjs-redis';
 import { PrismaModule } from 'nestjs-prisma';
+import { SocketGateway } from './socket/socket.gateway';
 
 @Module({
   imports: [
-    AuthModule,
     PrismaModule.forRoot({
       isGlobal: true,
       prismaServiceOptions: {
@@ -17,13 +17,22 @@ import { PrismaModule } from 'nestjs-prisma';
     RedisModule.forRoot({
       readyLog: true,
       errorLog: true,
-      config: {
-        host: 'localhost',
-        port: 6379,
-      },
+      config: [
+        {
+          namespace: DEFAULT_REDIS_NAMESPACE,
+          host: 'localhost',
+          port: 6379,
+        },
+        {
+          namespace: 'subscribe',
+          host: 'localhost',
+          port: 6379,
+        },
+      ],
     }),
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SocketGateway],
 })
 export class AppModule {}
