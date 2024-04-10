@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import {
   ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
@@ -30,5 +31,13 @@ export class SocketGateway
   }
   handleDisconnect(client: Socket) {
     this.logger.log(client.id);
+  }
+  @SubscribeMessage('process')
+  processOnMsg(@ConnectedSocket() socket: Socket, @MessageBody() data: any) {
+    const processMsg = {
+      type: 'process',
+      data: 'test',
+    };
+    process.send(processMsg);
   }
 }
