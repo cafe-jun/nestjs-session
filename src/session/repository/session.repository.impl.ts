@@ -3,6 +3,8 @@ import { SessionRepository } from '../service/repository/session.repository';
 import { DEFAULT_REDIS_NAMESPACE, InjectRedis } from '@liaoliaots/nestjs-redis';
 import { Redis } from 'ioredis';
 import { v4 as uuidV4 } from 'uuid';
+import { Session } from '../service/model/session.model';
+import { plainToInstance } from 'class-transformer';
 
 const SESSION_KEY = 'SESSION:';
 
@@ -10,8 +12,14 @@ const SESSION_KEY = 'SESSION:';
 export class SessionRepositoryImpl implements SessionRepository, OnModuleInit {
   constructor(
     @InjectRedis(DEFAULT_REDIS_NAMESPACE) private redisClient: Redis,
-    @InjectRedis('subscribe') private subscribe: Redis,
   ) {}
+  getById(): Promise<Session> {
+    throw new Error('Method not implemented.');
+  }
+  async getAll(): Promise<string[]> {
+    const keys = await this.redisClient.keys(`${SESSION_KEY}:*`);
+    return keys;
+  }
   async onModuleInit() {}
   async create(sessionDate: any): Promise<string> {
     const sessionId = uuidV4();

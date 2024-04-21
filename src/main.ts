@@ -1,7 +1,7 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { WorkerModule } from './worker.module';
 import { RedisIoAdapter } from './common/adapter/redis.adapter';
-import { Logger } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger } from '@nestjs/common';
 import { createServer } from 'http';
 import { setupMaster } from '@socket.io/sticky';
 import cluster from 'node:cluster';
@@ -27,6 +27,11 @@ async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(WorkerModule);
     const redisIoAdapter = new RedisIoAdapter(app);
     await redisIoAdapter.connectToRedis();
+    app.useGlobalInterceptors(
+      new ClassSerializerInterceptor(app.get(Reflector), {
+        strategy: 'excludeAll',
+      }),
+    );
     app.setGlobalPrefix('/api');
     app.useWebSocketAdapter(redisIoAdapter);
     await app.listen(3000);

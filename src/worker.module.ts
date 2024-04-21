@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { DEFAULT_REDIS_NAMESPACE, RedisModule } from '@liaoliaots/nestjs-redis';
 import { PrismaModule } from 'nestjs-prisma';
 import { SocketGateway } from './socket/socket.gateway';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -12,6 +13,12 @@ import { SocketGateway } from './socket/socket.gateway';
       isGlobal: true,
       prismaServiceOptions: {
         prismaOptions: {},
+      },
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
       },
     }),
     RedisModule.forRoot({
